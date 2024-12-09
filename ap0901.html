@@ -1,52 +1,36 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
 		<title> 応用プログラミング 第9,10回 自由課題 (ap0901)
 		</title>
 		<style>
-		  body { margin: 0; background-color: #23a3a3; color: gold}
-
+		  body { margin: 0; background-color:#305070; color:white;font-family: Impact}
+		  #status { font-size: xx-large; color: white;}
 		</style>
 	</head>
 	<body>
-		<div id="output">G384702023 西原樹</div>
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<div><table id="status">
+			<td>経過時間:　</td>
+			<td id="s">0</td>
+			<td id="life">秒</td></table>
+		<div>Created by G384702023 西原樹 </div></div>
+		<div id="WebGL-output"></div>
+		<div id="final-score" 
+     style="display: none; font-size: 48px; color: red; text-align: center; 
+     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+     z-index: 1000;">
+  Your Score: <span id="final-score-value"></span>秒
+</div>
 		<script type="importmap"> {
 			"imports" : {
 				"three" : "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
 				"three/addons" : "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/Addons.js",
 				"ili-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm"
 			}
-		} </script>
-		<script type="module" src="ap0901.js"></script>
-	</body>
-</html> -->
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title> 応用プログラミング 第4回 課題 (ap0401)
-		</title>
-		<style>
-		  body { margin: 0; background-color:#305070; color:white}
-		  #status { font-size: x-large; color: yellow;}
-		</style>
-	</head>
-	<body>
-		<div><table id="status">
-			<td>Score: </td>
-			<td id="score">00000000</td>
-			<td id="life">○○○</td></table>
-		<div>Created by G384702023 西原樹 </div></div>
-		<div id="WebGL-output"></div>
-		<script type="importmap"> {
-			"imports" : {
-				"three" : "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
-				"three/addons" : "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
-				"ili-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm"
-			}
-		} </script>
+
+		}
+	</script>
 		<script type="module" src="./ap0901.js"></script>
 	</body>
 </html>

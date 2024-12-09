@@ -1,59 +1,5 @@
-//
 // 応用プログラミング 第9,10回 自由課題 (ap0901.js)
 // G384702023 西原樹
-//
-// "use strict"; // 厳格モード
-
-// // ライブラリをモジュールとして読み込む
-// import * as THREE from "three";
-// import { GUI } from "ili-gui";
-
-// // ３Ｄページ作成関数の定義
-// function init() {
-//   // 制御変数の定義
-//   const param = {
-//     axes: true, // 座標軸
-//   };
-
-//   // GUIコントローラの設定
-//   const gui = new GUI();
-//   gui.add(param, "axes").name("座標軸");
-
-//   // シーン作成
-//   const scene = new THREE.Scene();
-
-//   // 座標軸の設定
-//   const axes = new THREE.AxesHelper(18);
-//   scene.add(axes);
-
-//   // カメラの作成
-//   const camera = new THREE.PerspectiveCamera(
-//     50, window.innerWidth/window.innerHeight, 0.1, 1000);
-//   camera.position.set(1,2,3);
-//   camera.lookAt(0,0,0);
-
-//   // レンダラの設定
-//   const renderer = new THREE.WebGLRenderer();
-//   renderer.setSize(window.innerWidth, innerHeight);
-//     document.getElementById("output").appendChild(renderer.domElement);
-
-//   // 描画処理
-
-//   // 描画関数
-//   function render() {
-//     // 座標軸の表示
-//     axes.visible = param.axes;
-//     // 描画
-//     renderer.render(scene, camera);
-//     // 次のフレームでの描画要請
-//     requestAnimationFrame(render);
-//   }
-
-//   // 描画開始
-//   render();
-// }
-
-// init();
 "use strict"; // 厳格モード
 
 import * as THREE from 'three';
@@ -65,11 +11,9 @@ function init() {
   const param = { // カメラの設定値
     fov: 60, // 視野角
     x: 0,
-    y: 25,
-    z: 10,
-    nRow: 6, /* ブロックの行数 */
-    nCol: 9, /* ブロックの列数 */
-    axes: true,
+    y: 15,
+    z: 5,
+    axes: false,
   };
 
   // シーン作成
@@ -79,19 +23,17 @@ function init() {
   const axes = new THREE.AxesHelper(18);
   scene.add(axes);
 
-  // ブロック数のカウント
-  let nBrick = 0
-  
-
   // スコア表示
   let score = 0;
-  // let life = 3;
+  let life = 3;
+  let gameStarted = false; // ゲーム開始フラグ
   function setScore(score) {
-    document.getElementById("score").innerText
-    =String(Math.round(score)).padStart(8, "0");
-    // document.getElementById("life").innerText
-    // = (life>0)? "○○○".substring(0, life) : "--- Game Over ---";
+    document.getElementById("s").innerText
+    =String(Math.round(score)).padStart(1, "0");
+    document.getElementById("life").innerText
+    = (life>0)? "秒".substring(0, life) : "";
   }
+  
 
   // Geometry の分割数
   const nSeg = 24;
@@ -145,16 +87,6 @@ function init() {
       ball.position.x = paddle.position.x;
       ball.position.z = paddle.position.z+(-2*ballR);
     }
-
-
-    // if(ballLive){
-    //   vBall.set(vx, 0, vz)
-    //   balll.position.addScaledVector(vBall, delta * speed);
-  
-    // }else{
-    //     balll.position.x = -paddle.position.x;
-    //     balll.position.z = -paddle.position.z+(-2*ballR);
-    // }
   }
   function moveBalll(delta) {
     if(ballLive){
@@ -193,15 +125,17 @@ function init() {
   // ボールを動かす
   function startBall() {
     ballLive = true;
-    speed = 10;
-    // if(){
-    //   speed = 100;
-    // }
+    speed = 6;
+    totalElapsedTime = 0;
+    gameStarted = true;
   }
 
+ 
   // マウスクリックでスタートする
   window.addEventListener("mousedown", () => {
-    if (!ballLive) { startBall(); }
+    if (!ballLive) { 
+      startBall();
+    }
   }, false);
 
   // 外枠 ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
@@ -215,7 +149,7 @@ function init() {
       new THREE.BoxGeometry(hFrameW, hFrameH, hFrameD/2),
       new THREE.MeshPhongMaterial({ color: 0x333333 })
     );
-    tFrame.position.z = -(vFrameD + hFrameD) /4;
+    tFrame.position.z = -(vFrameD + hFrameD) /3.8;
     scene.add(tFrame);
     //   下の枠
     const bFrame = tFrame.clone();
@@ -224,7 +158,7 @@ function init() {
     
     //   左の枠
     const lFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(vFrameW, vFrameH, vFrameD/2),
+      new THREE.BoxGeometry(vFrameW, vFrameH, vFrameD/1.9),
       new MeshPhongMaterial({ color: 0x333333 })
     );
     lFrame.position.x=(vFrameD)/3.5;
@@ -232,7 +166,7 @@ function init() {
 
     //   右の枠
     const rFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(vFrameW, vFrameH, vFrameD/2),
+      new THREE.BoxGeometry(vFrameW, vFrameH, vFrameD/1.9),
       new MeshPhongMaterial({ color: 0x333333 })
     );
       rFrame.position.x = -(vFrameD)/3.5;
@@ -330,11 +264,16 @@ function init() {
     if(ballll.position.z +ballRRR > vvvLimit){
       ballll.position.z = vvvLimit+(-ballRRR);
       vvvz = -Math.abs(-vvvz);
-      // stopBall();
     }
 
   
   
+  }
+  function endGame() {
+    gameStarted = false;
+    speed = 0; // ボールを停止
+    document.getElementById("final-score-value").innerText = score; // スコアをセット
+    document.getElementById("final-score").style.display = "block"; // スコア表示を有効化
   }
   // パドル ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
   // パドルの作成
@@ -369,7 +308,6 @@ function init() {
 
 
     // パドルの配置
-    // paddle.position.z = 0.4 * vFrameD;
     scene.add(paddle)
 
   }
@@ -406,22 +344,19 @@ function init() {
     Math.abs(ball.position.x - paddle.position.x)<paddleL/2+ballR){
     //中央
       if(ball.position.z < paddle.position.z){
-      vz = -Math.abs(vz);
+        endGame();
     }
     if(ball.position.z > paddle.position.z){
-      vz = Math.abs(vz);
+      endGame();
     }
     //右
     if(ball.position.x>paddle.position.x+paddleL/2){
-      vx = Math.abs(vx);
+      endGame();
     }
     //左
     else if(ball.position.x < paddle.position.x -paddleL/2){
-      vx = -Math.abs(vx);
+      endGame();
     }
-    // if(nBrick<=0){
-    //   resetBrick();
-    // }
   }
   }
 
@@ -432,22 +367,19 @@ function init() {
     Math.abs(balll.position.x - paddle.position.x)<paddleL/2+ballRR){
     //中央
       if(balll.position.z < paddle.position.z){
-      vvz = -Math.abs(vvz);
+      endGame();
     }
     if(balll.position.z > paddle.position.z){
-      vvz = Math.abs(vvz);
+      endGame();
     }
     //右
     if(balll.position.x>paddle.position.x+paddleL/2){
-      vvx = Math.abs(vvx);
+      endGame();
     }
     //左
     else if(balll.position.x < paddle.position.x -paddleL/2){
-      vvx = -Math.abs(vvx);
+      endGame();
     }
-    // if(nBrick<=0){
-    //   resetBrick();
-    // }
   }
   }
 
@@ -459,110 +391,22 @@ function init() {
     Math.abs(ballll.position.x - paddle.position.x)<paddleL/2+ballRRR){
     //中央
       if(balll.position.z < paddle.position.z){
-      vvvz = -Math.abs(vvvz);
+        endGame();
     }
     if(ballll.position.z > paddle.position.z){
-      vvvz = Math.abs(vvvz);
+      endGame();
     }
     //右
     if(ballll.position.x>paddle.position.x+paddleL/2){
-      vvvx = Math.abs(vvvx);
+      endGame();
     }
     //左
     else if(ballll.position.x < paddle.position.x -paddleL/2){
-      vvvx = -Math.abs(vvvx);
+      endGame();
     }
-    // if(nBrick<=0){
-    //   resetBrick();
-    // }
   }
   }
-
-  // // ブロック ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
-  // ブロックの生成
-  const bricks = new THREE.Group();
-  function makeBricks(){
-    const color = ["white", "red", "yellow", "blue", "purple", "green"];
-    const h = 0.8; /* ブロックの高さ */
-    const d = 0.4; /* ブロックの奥行 */
-    const gapX = 0.1; /* 横方向の隙間 */
-    const gapZ = 0.3; /* 縦方向の隙間 */
-
-    // ブロックの幅
-    const w = (hFrameW - 2 * vFrameW - (param.nCol + 1) * gapX) / param.nCol;
-    // ブロックを並べる
-    // for(let r = 0;r < param.nRow;r++){
-    //   for(let c=0;c<param.nCol;c++){
-    //     const brick = new THREE.Mesh(
-    //       new THREE.BoxGeometry(w,h,d),
-    //       new THREE.MeshLambertMaterial({color: color[r % color.length]})
-    //     );
-    //     brick.position.set(
-    //       (w + gapX)*(c-((param.nCol-1)/2)),
-    //       0,
-    //       -(d+gapZ)*r
-    //     )
-    //     brick.geometry.computeBoundingBox();
-    //     bricks.add(brick);
-    //     nBrick++;
-    //   }
-
-    // }
-   
-
-    // ブロック全体を奥に移動する
-    bricks.position.z = -4;
-    scene.add(bricks);
-
-  }
-  makeBricks();
-   
-
-  // ブロックの衝突検出
-  function brickCheck() {
-    let hit = false;
-    const sphere = ball.geometry.boundingSphere.clone();
-    sphere.translate(ball.position);
-
-    bricks.children.forEach((brick) => {
-   
-    if(!hit && brick.visible){
-      let box = brick.geometry.boundingBox.clone();
-      box.translate(bricks.position);
-      box.translate(brick.position);
-      if(box.intersectsSphere(sphere)){
-        hit = true;
-        brick.visible = false;
-        nBrick--;
-        score += ((-brick.position.z)/0.7)+1 * 100;
-        vz = -vz;
-        if(nBrick<=0){
-          score=score+100000;
-        }
-      }
-    }
-  });
-  }
-//ブロックの作り直し
-function remakeBricks(){
-  stopBall();
-  scene.remove(bricks);
-  bricks.clear();
-  nBrick = 0;
-  makeBricks();
-  scene.add(bricks);
-}
-
-  // ブロックの再表示
-  function resetBrick() {
-    nBrick = 0
-    bricks.children.forEach((brick)=>{
-      brick.visible=true;
-      nBrick++;
-    });
-
-  }
-
+  
   // 光源の設定
   const light = new THREE.SpotLight(0xffffff, 1000);
   light.position.set(0, 15, -10);
@@ -581,6 +425,7 @@ function remakeBricks(){
 
   // 描画更新
   const clock = new THREE.Clock(); // 時間の管理
+  let totalElapsedTime = 0;
   function render(time) {
     // カメラの再設定
     camera.fov = param.fov;
@@ -592,18 +437,42 @@ function remakeBricks(){
     // 座標軸の表示
     axes.visible = param.axes;
     // ゲーム画面の更新
+
     let delta = clock.getDelta(); // 経過時間の取得
+    if (gameStarted) { // ゲームが開始されている場合のみスコアを更新
+      totalElapsedTime += delta;
+      score = Math.floor(totalElapsedTime);
+      setScore(score); // スコア更新
+    }
+
+    
     frameCheck(); // 枠の衝突判定
     fframeCheck();
     ffframeCheck();
     paddleCheck(); // パドルの衝突判定
     ppaddleCheck();
     pppaddleCheck();
-    brickCheck(); // ブロックの衝突判定
     moveBall(delta); // ボールの移動
     moveBalll(delta);
     moveBallll(delta);
+    
+    score = Math.floor(totalElapsedTime);
     setScore(score); // スコア更新
+    
+    if(totalElapsedTime>10){
+      speed =8;
+    }
+    if(totalElapsedTime>20){
+      speed =10;
+    }
+    if(totalElapsedTime>30){
+      speed =12;
+    }if(totalElapsedTime>35){
+      speed =15;
+    }if(totalElapsedTime>40){
+      speed =20;
+    }
+    
     // 再描画
     requestAnimationFrame(render);
     renderer.render(scene, camera);
@@ -616,8 +485,6 @@ function remakeBricks(){
   gui.add(param, "y", -40, 80);
   gui.add(param, "z", -40, 80);
   gui.add(param, "axes");
-  // gui.add(param, "nRow", 1, 10, 1).onChange(remakeBricks);
-  // gui.add(param, "nCol", 1, 10, 1).onChange(remakeBricks);
   gui.close();
   // 描画
   render();
